@@ -1,0 +1,156 @@
+[gd_scene load_steps=13 format=3 uid="uid://gkjljqv11bv8"]
+
+[ext_resource type="Script" uid="uid://dxu6ncag6etnc" path="res://scenes/unit_card/unit_card.gd" id="1_2ee4v"]
+[ext_resource type="FontFile" uid="uid://8di0jvr25vat" path="res://assets/font/m5x7.ttf" id="1_efctb"]
+[ext_resource type="Texture2D" uid="uid://c4awhqfup7o2k" path="res://assets/sprites/gold.png" id="2_2ee4v"]
+[ext_resource type="Resource" uid="uid://cn7p64fh77igv" path="res://data/player/player_stats.tres" id="2_2yriv"]
+[ext_resource type="Texture2D" uid="uid://t5gyn6ed3fjp" path="res://assets/32rogues/rogues.png" id="3_8ee35"]
+[ext_resource type="Resource" uid="uid://cciiw8iq5jed0" path="res://data/units/rogue.tres" id="3_27mlq"]
+[ext_resource type="AudioStream" uid="uid://05sgyew2ynsi" path="res://assets/sfx/buy.ogg" id="4_27mlq"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_2yriv"]
+line_spacing = 0.0
+font = ExtResource("1_efctb")
+font_color = Color(0.6, 0.862745, 1, 0.729412)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_27mlq"]
+resource_local_to_scene = true
+bg_color = Color(0.00392157, 0.243137, 0.984314, 0.443137)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2qy8"]
+resource_local_to_scene = true
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.000359735, 0.0271026, 0.239331, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4b8rp"]
+resource_local_to_scene = true
+atlas = ExtResource("3_8ee35")
+region = Rect2(32, 128, 32, 32)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00nd2"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="UnitCard" type="Button"]
+custom_minimum_size = Vector2(80, 52)
+offset_right = 8.0
+offset_bottom = 8.0
+focus_mode = 0
+script = ExtResource("1_2ee4v")
+player_stats = ExtResource("2_2yriv")
+unit_stats = ExtResource("3_27mlq")
+buy_sound = ExtResource("4_27mlq")
+
+[node name="BackDrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.000359735, 0.0271026, 0.239331, 1)
+
+[node name="Traits" type="Label" parent="BackDrop"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 4.0
+offset_right = 47.0
+offset_bottom = 26.0
+text = "Magician"
+label_settings = SubResource("LabelSettings_2yriv")
+
+[node name="Bottom" type="Panel" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_27mlq")
+
+[node name="MarginContainer" type="MarginContainer" parent="Bottom"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_right = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Bottom/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="UnitName" type="Label" parent="Bottom/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pug"
+
+[node name="GoldContainer" type="HBoxContainer" parent="Bottom/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 1
+alignment = 2
+
+[node name="GoldIcon" type="TextureRect" parent="Bottom/MarginContainer/HBoxContainer/GoldContainer"]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_2ee4v")
+stretch_mode = 5
+
+[node name="GoldCost" type="Label" parent="Bottom/MarginContainer/HBoxContainer/GoldContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1"
+
+[node name="Border" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_i2qy8")
+
+[node name="UnitIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 8.0
+offset_top = 1.0
+offset_right = 40.0
+offset_bottom = 33.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_4b8rp")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EmptyPlaceholder" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_00nd2")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
+[connection signal="pressed" from="." to="." method="_on_pressed"]

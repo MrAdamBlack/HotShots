@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitStats" load_steps=5 format=3 uid="uid://cciiw8iq5jed0"]
+
+[ext_resource type="Script" uid="uid://i4iekrmyw16v" path="res://data/units/unit_stats.gd" id="1_y7mnb"]
+[ext_resource type="Script" uid="uid://cl3lqyfgwcbp8" path="res://data/traits/trait.gd" id="2_8lnic"]
+[ext_resource type="Resource" uid="uid://c2ks5mjyidvfy" path="res://data/traits/human.tres" id="3_m8i6r"]
+[ext_resource type="Resource" uid="uid://eatnj7welrps" path="res://data/traits/fighter.tres" id="4_arcgp"]
+
+[resource]
+script = ExtResource("1_y7mnb")
+name = "Rogue"
+rarity = 1
+gold_cost = 1
+tier = 1
+pool_count = 5
+traits = Array[ExtResource("2_8lnic")]([ExtResource("3_m8i6r"), ExtResource("4_arcgp")])
+range_of_attack = 1
+skin_coordinates = Vector2i(3, 0)
+metadata/_custom_type_script = "uid://i4iekrmyw16v"

@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://ctfdwrx56vrsd"]
+
+[ext_resource type="Script" uid="uid://ykw5ikfmjv6p" path="res://scenes/traits/traits.gd" id="1_i0cai"]
+[ext_resource type="PackedScene" uid="uid://53jcetbjyvrw" path="res://scenes/trait_ui/trait_ui.tscn" id="1_n8hla"]
+
+[node name="Traits" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_i0cai")
+
+[node name="TraitContainer" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 81.0
+offset_bottom = 207.0
+
+[node name="TraitUI" parent="TraitContainer" instance=ExtResource("1_n8hla")]
+layout_mode = 2
+
+[node name="TraitUI2" parent="TraitContainer" instance=ExtResource("1_n8hla")]
+layout_mode = 2
+
+[node name="TraitUI3" parent="TraitContainer" instance=ExtResource("1_n8hla")]
+layout_mode = 2
+
+[node name="TraitUI4" parent="TraitContainer" instance=ExtResource("1_n8hla")]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

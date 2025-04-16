@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitStats" load_steps=5 format=3 uid="uid://wky6g1agtnbm"]
+
+[ext_resource type="Script" uid="uid://i4iekrmyw16v" path="res://data/units/unit_stats.gd" id="1_2754n"]
+[ext_resource type="Script" uid="uid://cl3lqyfgwcbp8" path="res://data/traits/trait.gd" id="2_c613e"]
+[ext_resource type="Resource" uid="uid://ltgtkmb1nd5p" path="res://data/traits/elf.tres" id="3_4sx6m"]
+[ext_resource type="Resource" uid="uid://d3qjqdifdsq1y" path="res://data/traits/ranger.tres" id="4_34fyh"]
+
+[resource]
+script = ExtResource("1_2754n")
+name = "Archer"
+rarity = 0
+gold_cost = 1
+tier = 1
+pool_count = 5
+traits = Array[ExtResource("2_c613e")]([ExtResource("3_4sx6m"), ExtResource("4_34fyh")])
+range_of_attack = 100
+skin_coordinates = Vector2i(2, 0)
+metadata/_custom_type_script = "uid://i4iekrmyw16v"

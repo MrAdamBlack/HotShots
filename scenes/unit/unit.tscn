@@ -1,0 +1,172 @@
+[gd_scene load_steps=25 format=3 uid="uid://baysqup8m0h8a"]
+
+[ext_resource type="Texture2D" uid="uid://cx1ivjobggp8n" path="res://assets/sprites/rogues.png" id="1_fmv3f"]
+[ext_resource type="Script" uid="uid://dnd6v1ut5ds8c" path="res://scenes/unit/unit.gd" id="1_fvc8g"]
+[ext_resource type="Resource" uid="uid://cxa6y0nius52v" path="res://data/units/pug.tres" id="2_8477q"]
+[ext_resource type="Material" uid="uid://bb8m5fhpi4wqn" path="res://assets/shaders/2d_outline_shader.tres" id="3_3po7s"]
+[ext_resource type="Script" uid="uid://d3o5fu3w51wr1" path="res://components/drag_and_drop.gd" id="4_bhlit"]
+[ext_resource type="Script" uid="uid://cyrp3llkcyb3o" path="res://components/velocity_based_rotation.gd" id="5_vgvef"]
+[ext_resource type="PackedScene" uid="uid://05jnrr70caap" path="res://scenes/tier_icon/tier_icon.tscn" id="5_w7udy"]
+[ext_resource type="Script" uid="uid://bvmjfs07o6y2w" path="res://components/outline_highlighter.gd" id="7_0wuuu"]
+[ext_resource type="Script" uid="uid://5wv1w1a3bxmf" path="res://components/unit_animations.gd" id="9_vqlpx"]
+[ext_resource type="Script" uid="uid://cw1rku38o3mt" path="res://scenes/unit/unit_state_machine.gd" id="10_l0n34"]
+[ext_resource type="Script" uid="uid://bcombqpwtu8n1" path="res://scenes/unit/unit_states/unit_drag_state.gd" id="12_8477q"]
+[ext_resource type="Script" uid="uid://35wo2oa4xvb7" path="res://scenes/unit/unit_states/unit_drop_state.gd" id="13_5pcy6"]
+[ext_resource type="Script" uid="uid://g1vi44k1sw30" path="res://scenes/unit/unit_states/unit_idle_state.gd" id="13_8viqk"]
+[ext_resource type="Script" uid="uid://jjhlx5l5y6p7" path="res://scenes/unit/unit_states/unit_marching_state.gd" id="14_5pcy6"]
+[ext_resource type="Script" uid="uid://bb8080e1mk4j6" path="res://scenes/unit/unit_states/unit_battle_prep_state.gd" id="15_k1jjk"]
+[ext_resource type="Script" uid="uid://43o1h6oalwn4" path="res://scenes/unit/unit_states/unit_battle_state.gd" id="16_xlljb"]
+[ext_resource type="Script" uid="uid://drdn8j30k2t6k" path="res://scenes/unit/unit_states/unit_battle_end_state.gd" id="17_n8yuq"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8477q"]
+radius = 150.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8viqk"]
+radius = 30.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fmv3f"]
+size = Vector2(36, 36)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fmv3f"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fvc8g"]
+bg_color = Color(0, 0.873592, 0.261624, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vh40f"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bhlit"]
+bg_color = Color(0.11135, 0.504719, 0.731383, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+
+[node name="Unit" type="Area2D" groups=["units"]]
+script = ExtResource("1_fvc8g")
+stats = ExtResource("2_8477q")
+metadata/_edit_group_ = true
+
+[node name="Visuals" type="CanvasGroup" parent="."]
+material = ExtResource("3_3po7s")
+
+[node name="Skin" type="Sprite2D" parent="Visuals"]
+position = Vector2(16, 8)
+texture = ExtResource("1_fmv3f")
+flip_h = true
+region_enabled = true
+region_rect = Rect2(32, 128, 32, 32)
+
+[node name="Area2D" type="Area2D" parent="Visuals/Skin"]
+visible = false
+input_pickable = false
+monitoring = false
+monitorable = false
+
+[node name="AreaOfInterest" type="CollisionShape2D" parent="Visuals/Skin/Area2D"]
+visible = false
+shape = SubResource("CircleShape2D_8477q")
+debug_color = Color(0, 0.6, 0.701961, 0)
+
+[node name="RangeOfAttack" type="CollisionShape2D" parent="Visuals/Skin/Area2D"]
+shape = SubResource("CircleShape2D_8viqk")
+debug_color = Color(0, 0.6, 0.701961, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(16, 8)
+shape = SubResource("RectangleShape2D_fmv3f")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = 1.0
+offset_top = -20.0
+offset_right = 31.0
+offset_bottom = -14.0
+theme_override_styles/background = SubResource("StyleBoxFlat_fmv3f")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fvc8g")
+value = 46.03
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="."]
+offset_left = 1.0
+offset_top = -15.0
+offset_right = 31.0
+offset_bottom = -11.0
+theme_override_styles/background = SubResource("StyleBoxFlat_vh40f")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bhlit")
+value = 56.0
+show_percentage = false
+
+[node name="TierIcon" parent="." instance=ExtResource("5_w7udy")]
+offset_top = -12.0
+offset_bottom = -2.0
+stats = ExtResource("2_8477q")
+
+[node name="DragAndDrop" type="Node" parent="."]
+script = ExtResource("4_bhlit")
+
+[node name="VelocityBasedRotation" type="Node" parent="." node_paths=PackedStringArray("target")]
+script = ExtResource("5_vgvef")
+target = NodePath("../Visuals/Skin")
+max_rotation_degrees = 90
+x_velocity_threshold = 1.0
+
+[node name="OutlineHighlighter" type="Node" parent="." node_paths=PackedStringArray("visuals")]
+script = ExtResource("7_0wuuu")
+visuals = NodePath("../Visuals")
+outline_color = Color(0.398092, 0.059585, 0.507166, 1)
+outline_thickness = 1
+
+[node name="UnitAnimations" type="Node" parent="." node_paths=PackedStringArray("unit")]
+script = ExtResource("9_vqlpx")
+unit = NodePath("..")
+metadata/_custom_type_script = "uid://5wv1w1a3bxmf"
+
+[node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 1.0
+offset_top = 25.0
+offset_right = 41.0
+offset_bottom = 43.0
+
+[node name="UnitStateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("10_l0n34")
+initial_state = NodePath("UnitDragState")
+
+[node name="UnitDragState" type="Node" parent="UnitStateMachine" node_paths=PackedStringArray("target")]
+script = ExtResource("12_8477q")
+target = NodePath("../..")
+state = 1
+
+[node name="UnitDropState" type="Node" parent="UnitStateMachine"]
+script = ExtResource("13_5pcy6")
+
+[node name="UnitIdleState" type="Node" parent="UnitStateMachine"]
+script = ExtResource("13_8viqk")
+state = 2
+
+[node name="UnitMarchingState" type="Node" parent="UnitStateMachine"]
+script = ExtResource("14_5pcy6")
+state = 3
+
+[node name="UnitBattlePrepState" type="Node" parent="UnitStateMachine"]
+script = ExtResource("15_k1jjk")
+state = 4
+
+[node name="UnitBattleState" type="Node" parent="UnitStateMachine"]
+script = ExtResource("16_xlljb")
+state = 5
+
+[node name="UnitBattleEndState" type="Node" parent="UnitStateMachine"]
+script = ExtResource("17_n8yuq")
+state = 6
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
