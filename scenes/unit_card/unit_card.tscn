@@ -39,6 +39,7 @@ custom_minimum_size = Vector2(80, 52)
 offset_right = 8.0
 offset_bottom = 8.0
 focus_mode = 0
+keep_pressed_outside = true
 script = ExtResource("1_2ee4v")
 player_stats = ExtResource("2_2yriv")
 unit_stats = ExtResource("3_27mlq")

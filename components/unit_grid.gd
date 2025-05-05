@@ -4,6 +4,7 @@ extends Node2D
 signal unit_grid_changed
 
 @export var size: Vector2i
+@export var tile_size := Vector2(32, 32)  # Use your actual tile size
 
 var units: Dictionary
 
@@ -14,15 +15,14 @@ func _ready() -> void:
 			units[Vector2i(i, j)] = null
 	
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_accept"):
-		print("Unit Grid Dict: " + str(units))
-
+	pass
 
 func add_unit(tile: Vector2i, unit: Node) -> void:
 	units[tile] = unit
+	#add_child(unit) # Added by ChatGPT
 	unit.tree_exited.connect(_on_unit_tree_exited.bind(unit, tile))
-	unit_grid_changed.emit()
-
+	#unit_grid_changed.emit()
+	SignalBus.unit_grid_changed.emit()
 
 func remove_unit(tile: Vector2i) -> void:
 	var unit := units[tile] as Node
@@ -32,25 +32,32 @@ func remove_unit(tile: Vector2i) -> void:
 	
 	unit.tree_exited.disconnect(_on_unit_tree_exited)
 	units[tile] = null
-	unit_grid_changed.emit()
-
+	#unit_grid_changed.emit()
+	SignalBus.unit_grid_changed.emit()
 
 func is_tile_occupied(tile: Vector2i) -> bool:
 	return units[tile] != null
 
-
 func is_grid_full() -> bool:
 	return units.keys().all(is_tile_occupied)
 
-
 func get_first_empty_tile() -> Vector2i:
+	# Search systematically from (0,0)
+	for y in range(size.y):
+		for x in range(size.x):
+			var tile = Vector2i(x, y)
+			if not is_tile_occupied(tile):
+				return tile
+
+	# No empty tile found
+	return Vector2i(-1, -1)
+
+func get_first_empty_tile_OLD() -> Vector2i:
 	for tile in units:
 		if not is_tile_occupied(tile):
 			return tile
-
 	# no empty tile
 	return Vector2i(-1, -1)
-
 
 func get_all_units() -> Array[Unit]:
 	var unit_array: Array[Unit] = []

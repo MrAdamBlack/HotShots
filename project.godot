@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 MusicPlayer="*res://scenes/audio_player/music_player.tscn"
 SFXPlayer="*res://scenes/audio_player/sfx_player.tscn"
+SignalBus="*res://components/SignalBus.gd"
+Objectpool="*res://scenes/unit/objectpool.gd"
 
 [display]
 

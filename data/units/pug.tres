@@ -8,11 +8,16 @@
 [resource]
 script = ExtResource("1_n6iie")
 name = "Pug"
-rarity = 0
 gold_cost = 1
 tier = 1
-pool_count = 20
+pool_count = 1
 traits = Array[ExtResource("2_2wek4")]([ExtResource("3_x4jl8"), ExtResource("4_pbugd")])
-range_of_attack = 30
+area_of_interest = 100
+range_of_attack = 75
+march_speed = 20.0
+attack_speed = 100.0
+attack_damage = 1.0
+max_health = 100.0
+attack_power = 1.0
 skin_coordinates = Vector2i(1, 4)
 metadata/_custom_type_script = "uid://i4iekrmyw16v"

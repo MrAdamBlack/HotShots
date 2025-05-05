@@ -5,65 +5,54 @@ const CELL_SIZE := Vector2(32, 32)
 const HALF_CELL_SIZE := Vector2(16, 16)
 const QUARTER_CELL_SIZE := Vector2(8, 8)
 
+signal march_wave
+
 @onready var sell_portal: SellPortal = $SellPortal
 @onready var unit_mover: UnitMover = $UnitMover
 @onready var unit_spawner: UnitSpawner = $UnitSpawner
-@onready var unit_combiner: UnitCombiner = $UnitCombiner
 @onready var shop: Shop = %Shop
+#@onready var timer: Timer = $Timer
+#@onready var unit_combiner: UnitCombiner = $UnitCombiner
 
 @export var arena_music_stream: AudioStream
 
-func _ready() -> void:
-	print("arena.gd: _ready()")
-	shop.unit_bought_relay.connect(_on_unit_bought_relay)
-	unit_spawner.unit_spawned.connect(_on_unit_spawned)
-	
-	for card in shop.get_cards():
-		if card is UnitCard:
-			print("arena.gd. _ready(): for card in shop.get_cards(), if UnitCard")
-			card.unit_bought.connect(_on_unit_bought_relay)
-	
-	#unit_spawner.unit_spawned.connect(sell_portal.setup_unit)
-	#unit_spawner.unit_spawned.connect(unit_combiner.queue_unit_combination_update.unbind(1))
-	#shop.new_card.unit_bought.connect(unit_spawner.spawn_unit_at_mouse)
-	
-	#MusicPlayer.play(arena_music_stream)
-	print("**********")
-	print("arena.gd: Game finished loading ")
-	print("**********")
-	
-func _on_unit_bought_relay(unit_stats: UnitStats) -> void:
-	print("<-<-<- arena.gd: Signal Received: unit_bought_relay")
-	unit_spawner.spawn_unit_at_mouse(unit_stats)
-	
-func _on_unit_spawned(unit: Unit) -> void:
-	print("<-<-<- arena.gd: Signal Received: unit_spawned")
-	unit_spawner.spawn_unit_at_mouse
-	unit_mover.setup_unit
-	
-func _on_unit_bought(stats: UnitStats) -> void:
-	print("arena.gd: _on_unit_bought")
-	unit_spawner.spawn_unit_at_mouse(stats)
 
+func _ready() -> void:
+	print("@ Arena.gd _ready()")
+	SignalBus.connect("unit_spawned", Callable(self, "sell_portal.setup_unit"))
+	#MusicPlayer.play(arena_music_stream)
+	#timer.start(10)
+	#timer.connect("timeout", _on_Timer_timeout)
+
+func _on_Timer_timeout() -> void:
+	print("->->-> arena.gd: march_wave.emit()")
+	SignalBus.march_wave.emit()
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_accept"):
-		unit_combiner.queue_unit_combination_update()
-	elif event.is_action_pressed("KEY_1"):  # Using KEY_1 as an example
-		print("+++Dev Comment: Game Just Loaded")
+	if event.is_action_pressed("KEY_1"):  # Using KEY_1 as an example
+		print("++++++ Dev Comment:")
+		print("       Game Just Loaded")
 	elif event.is_action_pressed("KEY_2"):
-		print("+++Dev Comment: About to Click on Shop")
+		print("++++++ Dev Comment:")
+		print("       Starting Drag")
 	elif event.is_action_pressed("KEY_3"):
-		print("+++Dev Comment: About to Left Click on Board")
+		print("++++++ Dev Comment:")
+		print("       Release Drag")
 	elif event.is_action_pressed("KEY_4"):
-		print("+++Dev Comment: Unit Selected")
+		print("++++++ Dev Comment:")
+		print("       About to click on board. No unit in hand")
 	elif event.is_action_pressed("KEY_5"):
-		print("+++Dev Comment: Enemy Detected")
+		print("++++++ Dev Comment:")
+		print("       Enemy Detected")
 	elif event.is_action_pressed("KEY_6"):
-		print("+++Dev Comment: Resource Gathered")
+		print("++++++ Dev Comment:")
+		print("       Resource Gathered")
 	elif event.is_action_pressed("KEY_7"):
-		print("+++Dev Comment: Ability Used")
+		print("++++++ Dev Comment:")
+		print("       Ability Used")
 	elif event.is_action_pressed("KEY_8"):
-		print("+++Dev Comment: Dialogue Started")
+		print("++++++ Dev Comment:")
+		print("       Dialogue Started")
 	elif event.is_action_pressed("KEY_9"):
-		print("+++Dev Comment: Menu Opened")
+		print("++++++ Dev Comment:")
+		print("       About to press Space Bar to deploy units!")

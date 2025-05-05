@@ -5,29 +5,20 @@ extends Resource
 
 var unit_pool: Array[UnitStats]
 
-
 func generate_unit_pool() -> void:
 	unit_pool = []
 	
 	for unit: UnitStats in available_units:
 		for i in unit.pool_count:
 			unit_pool.append(unit)
-
-
-func get_random_unit_by_rarity(rarity: UnitStats.Rarity) -> UnitStats:
-	var units := unit_pool.filter(
-		func(unit: UnitStats):
-			return unit.rarity == rarity
-	)
-	
-	if units.is_empty():
+			
+func get_next_unit() -> UnitStats:
+	if unit_pool.is_empty():
 		return null
-	
-	var picked_unit: UnitStats = units.pick_random()
-	unit_pool.erase(picked_unit)
-	
-	return picked_unit
 
+	var picked_unit: UnitStats = unit_pool[0]
+	unit_pool.remove_at(0)
+	return picked_unit
 
 func add_unit(unit: UnitStats) -> void:
 	var combined_count := unit.get_combined_unit_count()

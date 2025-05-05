@@ -8,11 +8,16 @@
 [resource]
 script = ExtResource("1_y7mnb")
 name = "Rogue"
-rarity = 1
 gold_cost = 1
 tier = 1
 pool_count = 5
 traits = Array[ExtResource("2_8lnic")]([ExtResource("3_m8i6r"), ExtResource("4_arcgp")])
-range_of_attack = 1
+area_of_interest = 100
+range_of_attack = 10
+march_speed = 20.0
+attack_speed = 100.0
+attack_damage = 14.0
+max_health = 100.0
+attack_power = 14.0
 skin_coordinates = Vector2i(3, 0)
 metadata/_custom_type_script = "uid://i4iekrmyw16v"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://baysqup8m0h8a"]
+[gd_scene load_steps=24 format=3 uid="uid://baysqup8m0h8a"]
 
 [ext_resource type="Texture2D" uid="uid://cx1ivjobggp8n" path="res://assets/sprites/rogues.png" id="1_fmv3f"]
 [ext_resource type="Script" uid="uid://dnd6v1ut5ds8c" path="res://scenes/unit/unit.gd" id="1_fvc8g"]
@@ -11,18 +11,18 @@
 [ext_resource type="Script" uid="uid://5wv1w1a3bxmf" path="res://components/unit_animations.gd" id="9_vqlpx"]
 [ext_resource type="Script" uid="uid://cw1rku38o3mt" path="res://scenes/unit/unit_state_machine.gd" id="10_l0n34"]
 [ext_resource type="Script" uid="uid://bcombqpwtu8n1" path="res://scenes/unit/unit_states/unit_drag_state.gd" id="12_8477q"]
-[ext_resource type="Script" uid="uid://35wo2oa4xvb7" path="res://scenes/unit/unit_states/unit_drop_state.gd" id="13_5pcy6"]
 [ext_resource type="Script" uid="uid://g1vi44k1sw30" path="res://scenes/unit/unit_states/unit_idle_state.gd" id="13_8viqk"]
 [ext_resource type="Script" uid="uid://jjhlx5l5y6p7" path="res://scenes/unit/unit_states/unit_marching_state.gd" id="14_5pcy6"]
-[ext_resource type="Script" uid="uid://bb8080e1mk4j6" path="res://scenes/unit/unit_states/unit_battle_prep_state.gd" id="15_k1jjk"]
+[ext_resource type="Script" uid="uid://bb8080e1mk4j6" path="res://scenes/unit/unit_states/unit_pre_battle_state.gd" id="15_k1jjk"]
 [ext_resource type="Script" uid="uid://43o1h6oalwn4" path="res://scenes/unit/unit_states/unit_battle_state.gd" id="16_xlljb"]
-[ext_resource type="Script" uid="uid://drdn8j30k2t6k" path="res://scenes/unit/unit_states/unit_battle_end_state.gd" id="17_n8yuq"]
+[ext_resource type="Script" uid="uid://drdn8j30k2t6k" path="res://scenes/unit/unit_states/unit_post_battle_state.gd" id="17_n8yuq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_8477q"]
-radius = 150.0
+resource_local_to_scene = true
+radius = 100.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_8viqk"]
-radius = 30.0
+radius = 14.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fmv3f"]
 size = Vector2(36, 36)
@@ -49,7 +49,8 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0, 0, 0, 1)
 
-[node name="Unit" type="Area2D" groups=["units"]]
+[node name="Unit" type="Area2D"]
+disable_mode = 2
 script = ExtResource("1_fvc8g")
 stats = ExtResource("2_8477q")
 metadata/_edit_group_ = true
@@ -64,18 +65,25 @@ flip_h = true
 region_enabled = true
 region_rect = Rect2(32, 128, 32, 32)
 
-[node name="Area2D" type="Area2D" parent="Visuals/Skin"]
-visible = false
+[node name="AreaOfInterest" type="Area2D" parent="Visuals/Skin"]
+collision_layer = 0
+collision_mask = 0
 input_pickable = false
 monitoring = false
 monitorable = false
 
-[node name="AreaOfInterest" type="CollisionShape2D" parent="Visuals/Skin/Area2D"]
-visible = false
+[node name="CollisionAreaOfInterest" type="CollisionShape2D" parent="Visuals/Skin/AreaOfInterest"]
 shape = SubResource("CircleShape2D_8477q")
 debug_color = Color(0, 0.6, 0.701961, 0)
 
-[node name="RangeOfAttack" type="CollisionShape2D" parent="Visuals/Skin/Area2D"]
+[node name="RangeOfAttack" type="Area2D" parent="Visuals/Skin"]
+collision_layer = 0
+collision_mask = 0
+input_pickable = false
+monitoring = false
+monitorable = false
+
+[node name="CollisionRangeOfAttack" type="CollisionShape2D" parent="Visuals/Skin/RangeOfAttack"]
 shape = SubResource("CircleShape2D_8viqk")
 debug_color = Color(0, 0.6, 0.701961, 0)
 
@@ -143,30 +151,26 @@ initial_state = NodePath("UnitDragState")
 [node name="UnitDragState" type="Node" parent="UnitStateMachine" node_paths=PackedStringArray("target")]
 script = ExtResource("12_8477q")
 target = NodePath("../..")
-state = 1
-
-[node name="UnitDropState" type="Node" parent="UnitStateMachine"]
-script = ExtResource("13_5pcy6")
 
 [node name="UnitIdleState" type="Node" parent="UnitStateMachine"]
 script = ExtResource("13_8viqk")
-state = 2
+state = 1
 
 [node name="UnitMarchingState" type="Node" parent="UnitStateMachine"]
 script = ExtResource("14_5pcy6")
-state = 3
+state = 2
 
-[node name="UnitBattlePrepState" type="Node" parent="UnitStateMachine"]
+[node name="UnitPreBattleState" type="Node" parent="UnitStateMachine"]
 script = ExtResource("15_k1jjk")
-state = 4
+state = 3
 
 [node name="UnitBattleState" type="Node" parent="UnitStateMachine"]
 script = ExtResource("16_xlljb")
-state = 5
+state = 4
 
-[node name="UnitBattleEndState" type="Node" parent="UnitStateMachine"]
+[node name="UnitPostBattleState" type="Node" parent="UnitStateMachine"]
 script = ExtResource("17_n8yuq")
-state = 6
+state = 5
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

@@ -11,39 +11,29 @@ extends Area2D
 
 var current_unit: Unit
 
-
 func _ready() -> void:
 	var units := get_tree().get_nodes_in_group("units")
 	for unit: Unit in units:
-		pass
-		#setup_unit(unit)
+		setup_unit(unit)
 
-
-#func setup_unit(unit: Unit) -> void:
+func setup_unit(unit: Unit) -> void:
 	#unit.drag_and_drop.dropped.connect(_on_unit_dropped.bind(unit))
-	#unit.quick_sell_pressed.connect(_sell_unit.bind(unit))
-
+	unit.quick_sell_pressed.connect(_sell_unit.bind(unit))
 
 func _sell_unit(unit: Unit) -> void:
 	player_stats.gold += unit.stats.get_gold_value()
-	# TODO give items back to item pool
-	unit_pool.add_unit(unit.stats)
-	
 	unit.queue_free()
 	SFXPlayer.play(sell_sound)
 
-
-func _on_unit_dropped(_starting_position: Vector2, unit: Unit) -> void:
-	if unit and unit == current_unit:
-		_sell_unit(unit)
-
+#func _on_unit_dropped(_starting_position: Vector2, unit: Unit) -> void:
+	#if unit and unit == current_unit:
+		#_sell_unit(unit)
 
 func _on_area_entered(unit: Unit) -> void:
 	current_unit = unit
 	outline_highlighter.highlight()
 	gold_label.text = str(unit.stats.get_gold_value())
 	gold.show()
-
 
 func _on_area_exited(unit: Unit) -> void:
 	if unit and unit == current_unit:

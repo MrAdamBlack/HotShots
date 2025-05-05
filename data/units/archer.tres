@@ -8,11 +8,12 @@
 [resource]
 script = ExtResource("1_2754n")
 name = "Archer"
-rarity = 0
 gold_cost = 1
 tier = 1
-pool_count = 5
+pool_count = 1
 traits = Array[ExtResource("2_c613e")]([ExtResource("3_4sx6m"), ExtResource("4_34fyh")])
-range_of_attack = 100
+area_of_interest = 150
+range_of_attack = 90
+march_speed = 20.0
 skin_coordinates = Vector2i(2, 0)
 metadata/_custom_type_script = "uid://i4iekrmyw16v"
