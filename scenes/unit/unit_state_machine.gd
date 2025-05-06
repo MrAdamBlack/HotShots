@@ -10,14 +10,6 @@ var is_initialized = false
 var unit: Unit = null
 var enemy: Unit
 
-#func remove_clone(clone: Unit) -> void:
-	## Return the clone to the pool when it's no longer needed
-	#if clone_pool.size() < MAX_CLONES_IN_POOL:
-		#clone_pool.append(clone)
-		#clone.queue_free()  # Optionally, remove clone from the scene
-	#else:
-		#clone.queue_free()  # If pool is full, just free the clone
-
 func init(unit: Unit, initial_state_enum: UnitState.State = -1) -> void:
 	self.unit = unit
 	
@@ -26,13 +18,12 @@ func init(unit: Unit, initial_state_enum: UnitState.State = -1) -> void:
 	is_initialized = true
 
 	SignalBus.global_transition_requested.connect(_on_global_transition_requested)
-	#SignalBus.health_depleted.connect(_on_unit_death)
 			
 	for child in get_children():
 		if child is UnitState:
 			states[child.state] = child
 			child.unit = unit
-			child.fsm = self
+			child.unit_state_machine = self
 			child.set_process(false)
 			child.set_process_input(false)
 			child.set_process_unhandled_input(false)
@@ -102,11 +93,7 @@ func request_transition(requester: Node,
 						from: UnitState, 
 						to: UnitState.State, 
 						enemy: Unit = null) -> void:
-	# Ensure enemy is passed correctly, if provided
-	#if enemy:
-		#print("Transitioning to state: " + str(to) + " with enemy: " + enemy.stats.name)
-	#else:
-		#print("Transitioning to state: " + str(to) + " without enemy.")
+
 	if current_state:
 		_on_transition_requested(requester, current_state, to, enemy)
 
@@ -144,3 +131,9 @@ func _on_unit_death(dead_unit: Unit) -> void:
 		UnitState.State.IDLE,
 		enemy
 	)
+
+func get_current_state_enum() -> UnitState.State:
+	for state_enum in states.keys():
+		if states[state_enum] == current_state:
+			return state_enum
+	return UnitState.State.IDLE  # Fallback

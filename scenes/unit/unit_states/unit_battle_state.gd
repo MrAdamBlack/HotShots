@@ -17,6 +17,40 @@ func _on_enemy_death(dead_unit: Unit) -> void:
 	if enemy and dead_unit == enemy:
 		print("unit_battle_state.gd: Enemy died, clearing reference.")
 		enemy = null
+		# Transition to the MARCHING state after enemy death
+		unit_state_machine.request_transition(unit, 
+							unit_state_machine.current_state, 
+							UnitState.State.MARCHING, enemy)
+	else:
+		# If the dead enemy is not the current target, we might need to handle this differently
+		print("unit_battle_state.gd: Dead unit is not the current target.")
+		
+	# After removing the enemy, check if there are other enemies to engage
+	_check_for_new_enemy()
+
+	# This helper function is called to find a new closest enemy after the death of the current one
+func _check_for_new_enemy() -> void:
+	var closest_enemy = unit._find_closest_enemy()
+
+	if closest_enemy:
+		print("unit_battle_state.gd: New closest enemy found: ", closest_enemy)
+		enemy = closest_enemy
+		# You can also update any targeting system or AI behavior here
+
+	else:
+		print("unit_battle_state.gd: No enemies left, transitioning to POST_BATTLE.")
+		unit_state_machine.request_transition(unit, 
+							unit_state_machine.current_state, 
+							UnitState.State.POST_BATTLE, enemy)
+
+
+func _on_enemy_death_OLD(dead_unit: Unit) -> void:
+	if enemy and dead_unit == enemy:
+		print("unit_battle_state.gd: Enemy died, clearing reference.")
+		enemy = null
+		unit_state_machine.request_transition(unit, 
+							unit_state_machine.current_state, 
+							UnitState.State.MARCHING, enemy)
 
 func exit() -> void:
 	# Reset movement logic or any other needed cleanup

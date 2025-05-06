@@ -1,6 +1,9 @@
 class_name UnitStats
 extends Resource
 
+signal self_dead(stats: UnitStats)
+
+
 @export var name: String
 
 @export_category("Data")
@@ -21,18 +24,21 @@ var health: float: set = set_health
 @export_category("Visuals")
 @export var skin_coordinates: Vector2i
 
-signal self_dead(stats: UnitStats)
 
 func _init() -> void:
 	health = max_health
-	
+
 func set_health(value: float) -> void:
 	var old_health = health
 	health = value
+	#print("unit_stats: set_health")
+	#print("\tOld Health: ", old_health)
+	#print("\tHealth: ", health)
 	if old_health > 0 and health <= 0:
-		print("\tUnit ", name, " died")
-		emit_signal("self_dead", self)  # Emit signal with UnitStats instance
-		
+		#print(">>>>> unit_stats.gd: set_health: emit_signal(\"self_dead\", self)")
+		#print("\tDead Unit ", name)
+		# Emit signal with UnitStats instance
+		emit_signal("self_dead", self)  
 
 func get_combined_unit_count() -> int:
 	return 3 ** (tier-1)

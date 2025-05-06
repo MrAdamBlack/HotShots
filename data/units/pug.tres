@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="UnitStats" load_steps=5 format=3 uid="uid://cxa6y0nius52v"]
+[gd_resource type="Resource" script_class="UnitStats" load_steps=4 format=3 uid="uid://cxa6y0nius52v"]
 
 [ext_resource type="Script" uid="uid://i4iekrmyw16v" path="res://data/units/unit_stats.gd" id="1_n6iie"]
 [ext_resource type="Script" uid="uid://cl3lqyfgwcbp8" path="res://data/traits/trait.gd" id="2_2wek4"]
-[ext_resource type="Resource" uid="uid://c2ks5mjyidvfy" path="res://data/traits/human.tres" id="3_x4jl8"]
 [ext_resource type="Resource" uid="uid://c5g6w5ucdrim2" path="res://data/traits/wizard.tres" id="4_pbugd"]
 
 [resource]
@@ -11,11 +10,11 @@ name = "Pug"
 gold_cost = 1
 tier = 1
 pool_count = 1
-traits = Array[ExtResource("2_2wek4")]([ExtResource("3_x4jl8"), ExtResource("4_pbugd")])
+traits = Array[ExtResource("2_2wek4")]([ExtResource("4_pbugd")])
 area_of_interest = 100
-range_of_attack = 75
+range_of_attack = 100
 march_speed = 20.0
-attack_speed = 100.0
+attack_speed = 10.0
 attack_damage = 1.0
 max_health = 100.0
 attack_power = 1.0

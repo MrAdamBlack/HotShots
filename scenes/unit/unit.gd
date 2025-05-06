@@ -3,6 +3,8 @@ class_name Unit
 extends Area2D
 
 signal quick_sell_pressed
+signal enemy_spotted(enemy: Unit)
+signal no_more_enemies
 
 @export var stats: UnitStats : set = set_stats
 
@@ -21,12 +23,17 @@ signal quick_sell_pressed
 
 var alive := true
 var is_hovered := false
+var nearby_enemies: Array = []
+var current_target: Unit = null
+var attackable_enemies := [] 
+var enemy: Unit = null
 
 func _ready() -> void:
 	print("unit.gd. Unit READY: ", self)
 	#SignalBus.health_depleted.connect(_on_health_depleted)
 	# Ensure that Unit is connected to the health-depleted signal of UnitStats
 	stats.self_dead.connect(_on_self_dead)
+	SignalBus.enemy_dead.connect(_on_enemy_dead)
 
 	if collision_area_of_interest.shape is CircleShape2D:
 		collision_area_of_interest.shape.radius = stats.area_of_interest
@@ -93,6 +100,8 @@ func update_health_bar() -> void:
 		health_bar.value = current / maximum * health_bar.max_value
 
 func take_damage(amount: float) -> void:
+	print("unit.gd: Take Damage")
+	print("\t", self.stats.name, " is taking damage!!!")
 	stats.health -= amount
 	stats.health = max(stats.health, 0)
 	update_health_bar()
@@ -110,23 +119,19 @@ func is_dead() -> bool:
 	return stats.health <= 0
 
 func set_stats(value: UnitStats) -> void:
-	# Disconnect from old stats if needed
-	#if stats and SignalBus.health_depleted.is_connected(self._on_health_depleted):
-		#SignalBus.health_depleted.disconnect(self._on_health_depleted)
 	if stats and SignalBus.enemy_dead.is_connected(self._on_health_depleted):
 		SignalBus.enemy_dead.disconnect(self._on_health_depleted)
 
 	stats = value
 	if value == null:
 		return
-	if not Engine.is_editor_hint():
-		stats = value.duplicate()
+	
+	stats = value.duplicate()
 	if not is_node_ready():
 		await ready
 
 	# Initialize health and connect to signal
 	stats.health = stats.max_health
-	#SignalBus.health_depleted.connect(self._on_health_depleted)
 
 	skin.region_rect.position = Vector2(stats.skin_coordinates) * Arena.CELL_SIZE
 	tier_icon.stats = stats
@@ -144,14 +149,111 @@ func _on_health_depleted(dead_unit: Unit) -> void:
 	else:
 		print("Someone else died: ", dead_unit.stats.name)
 
+func _find_closest_enemy() -> Unit:
+	if nearby_enemies.size() == 0:
+		return null  # No enemies in the list
+
+	var closest_enemy: Unit = null
+	var closest_distance = INF  # Start with an infinite distance
+
+	for enemy in nearby_enemies:
+		if enemy is Unit:  # Ensure the enemy is of type 'Unit'
+			var distance = global_position.distance_squared_to(enemy.global_position)
+			if distance < closest_distance:
+				closest_distance = distance
+				closest_enemy = enemy  # Cast to Unit
+
+	return closest_enemy  # Return the closest Unit or null if no valid enemies
+
+func _on_area_of_interest_area_entered(area: Area2D) -> void:
+	nearby_enemies.append(area)
+	nearby_enemies.sort_custom(func(a, b):
+		return global_position.distance_squared_to(a.global_position) < global_position.distance_squared_to(b.global_position)
+	)
+	if nearby_enemies.size() == 1:
+		enemy_spotted.emit(nearby_enemies[0])
+#
+func _on_area_of_interest_area_exited(area: Area2D) -> void:
+	nearby_enemies.erase(area)
+
+	 ##Check if the list is now empty → return to MARCHING
+	#if nearby_enemies.is_empty():
+		#if unit_state_machine.get_current_state_enum() != unit_state_machine.UnitState.State.MARCHING:
+			#unit_state_machine.request_transition(self,
+				#unit_state_machine.current_state,
+				#UnitState.State.MARCHING)
+		#no_more_enemies.emit()
+		# This is the unit saying, there are no more enemies in my AOI
+		# so, .... nothign should be done right... This should just maintain the list...
+		# This transition should be done in POST BATTLE
+		
+		#return
+
+	# Resolve Area2D to Unit
+	var exited_parent = area.get_parent()
+	while exited_parent != null and not exited_parent is Unit:
+		exited_parent = exited_parent.get_parent()
+
+	# If current target left, retarget to the new closest enemy
+	if exited_parent == current_target and nearby_enemies.size() > 0:
+		var new_target = nearby_enemies[0].get_parent()
+		while new_target != null and not new_target is Unit:
+			new_target = new_target.get_parent()
+		if new_target != null:
+			unit_state_machine.request_transition(self,
+				unit_state_machine.current_state,
+				UnitState.State.PRE_BATTLE,
+				new_target)
+
+func _on_range_of_attack_area_entered(area: Area2D) -> void:
+	attackable_enemies.append(area)  # Add enemy to the list
+	print("Added to attackable enemies: ", area.stats.name)
+	_update_target()  # Update the target based on proximity
+
+func _on_range_of_attack_area_exited(area: Area2D) -> void:
+	if area in attackable_enemies:  # If the enemy is in the list, remove it
+		attackable_enemies.erase(area)
+		print("Removed from attackable enemies: ", area.stats.name)
+		_update_target()  # Reevaluate the target if necessary
+
+func _update_target() -> void:
+	print("unit.gd: _update_target")
+	if attackable_enemies.size() > 0:
+		enemy = _find_closest_enemy()
+		print("\tEnemy: ", enemy.stats.name)
+		unit_state_machine.request_transition(self, 
+				unit_state_machine.current_state, 
+				UnitState.State.BATTLE, 
+				enemy)
+	else:
+		enemy = null
+		transition_to_post_battle()
+
+func _on_enemy_dead(dead_unit: Unit) -> void:
+	print("<<<<<<< unit.gd: SIGNAL self_dead")
+	print("\tFunc: _on_self_dead")
+	print("\tI am: ", self.stats.name)
+	print("\tDead Unit: ", dead_unit.stats.name)
+	# Remove from both tracking arrays
+	if dead_unit in nearby_enemies:
+		nearby_enemies.erase(dead_unit)
+
+	if dead_unit in attackable_enemies:
+		attackable_enemies.erase(dead_unit)
+		_update_target()
+		
 func _on_self_dead(dead_stats: UnitStats) -> void:
-	print("unit.gd: _on_self_dead")
-	print("\t%s has died!" % dead_stats.name)
+	print("<<<<<<< unit.gd: SIGNAL self_dead")
+	print("\tFunc: _on_self_dead")
+	print("\tI am: ", dead_stats.name)
 	if dead_stats == self.stats:
-		print("\t>>> unit.gd: I DIED ", self.stats.name)
+		print("\t>>> unit.gd: Dead Enemy ", self.stats.name)
 		SignalBus.enemy_dead.emit(self)
 		handle_death()
 	else:
 		print("\tSomeone else died: ", dead_stats.name)
-	# Handle unit death logic here, such as state transition or cleanup
-	#unit_state_machine.request_transition(unit, unit_state_machine.current_state, UnitState.State.DEAD, enemy)
+
+func transition_to_post_battle() -> void:
+	unit_state_machine.request_transition(self, 
+					unit_state_machine.current_state, 
+					UnitState.State.POST_BATTLE)

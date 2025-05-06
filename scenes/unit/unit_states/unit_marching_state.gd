@@ -6,15 +6,21 @@ extends UnitState
 
 func enter() -> void:
 	print("********** Entering Marching State ********** [%s] (%s)" % [unit.stats.name, unit])
-	unit.area_of_interest.monitoring = true
-	unit.area_of_interest.monitorable = true
-	unit.area_of_interest.area_entered.connect(_on_area_of_interest_entered)
+	unit.enemy_spotted.connect(_on_enemy_spotted)
+	#unit.area_of_interest.monitoring = true
+	#unit.area_of_interest.monitorable = true
+	#unit.area_of_interest.area_entered.connect(_on_area_of_interest_entered)
 	
 	for group in unit.get_groups():
 		if group == "dragging":
 			unit.remove_from_group(group)
 
-func _on_area_of_interest_entered(area: Area2D) -> void:
+#func _on_area_of_interest_entered(area: Area2D) -> void:
+func _on_enemy_spotted(area: Area2D) -> void:
+	print("Unit_marching_state.gd: _on_enemy_spotted")
+	print("\tI am: ", unit.stats.name)
+	print("\tSpotted: ", area)
+	
 	var groups = area.get_groups()
 	var original_parent = area.get_parent()
 	var area_parent = original_parent
@@ -34,7 +40,7 @@ func exit() -> void:
 
 func _process(delta: float) -> void:
 	# Move the unit to the right based on the march speed
-	unit.velocity_based_rotation.enabled = false
+	#unit.velocity_based_rotation.enabled = false
 	var direction := Vector2.RIGHT  # Default
 
 	if unit.is_in_group("player2_clone"):

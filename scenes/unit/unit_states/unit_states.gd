@@ -10,26 +10,34 @@ enum State {
 	POST_BATTLE  # No user control
 }
 
-@onready var arena: Arena = find_arena()
+#@onready var arena: Arena = find_arena()
+var arena: Arena
 @export var state: State
 var enemy: Unit
-
 var unit: Unit
-var fsm: UnitStateMachine
 var unit_state_machine: UnitStateMachine  # Reference to the state machine
 
 func init(state_machine: UnitStateMachine, unit_node: Node = null, 
 				previous_state: UnitState = null, enemy: Unit = null) -> void:
 	self.unit_state_machine = state_machine
 	self.unit = unit_node if unit_node else state_machine.current_state.unit
-	self.fsm = state_machine
 	self.enemy = enemy
+	self.arena = find_arena()
+	if not self.arena:
+		push_error("UnitState could not find Arena in parent chain.")
 
 func find_arena() -> Arena:
 	var current = get_parent()
 	while current and not (current is Arena):
 		current = current.get_parent()
 	return current as Arena
+	
+# Reset the state, clearing any properties that are specific to this state
+func reset() -> void:
+	unit = null
+	unit_state_machine = null
+	enemy = null
+	# Any other properties specific to this state can also be reset here
 
 func enter() -> void:
 	pass
@@ -42,13 +50,6 @@ func on_input(_event: InputEvent) -> void:
 	
 func on_gui_input(_event: InputEvent) -> void:
 	pass
-	
-# Reset the state, clearing any properties that are specific to this state
-func reset() -> void:
-	unit = null
-	fsm = null
-	enemy = null
-	# Any other properties specific to this state can also be reset here
 
 func on_mouse_entered() -> void:
 	pass
