@@ -10,7 +10,6 @@ enum State {
 	POST_BATTLE  # No user control
 }
 
-#@onready var arena: Arena = find_arena()
 var arena: Arena
 @export var state: State
 var enemy: Unit

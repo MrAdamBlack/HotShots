@@ -14,19 +14,23 @@ func enter() -> void:
 	SignalBus.enemy_dead.connect(_on_enemy_death)
 
 func _on_enemy_death(dead_unit: Unit) -> void:
+	print("unit_battle_state.gd: ")
+	print("\t_on_enemy_death()")
+	print("\t<<<<<<<<< SIGNAL RECEIVED: enemy_dead")
+	print("\tDead Unit: ", dead_unit.stats.name)
 	if enemy and dead_unit == enemy:
 		print("unit_battle_state.gd: Enemy died, clearing reference.")
 		enemy = null
 		# Transition to the MARCHING state after enemy death
-		unit_state_machine.request_transition(unit, 
-							unit_state_machine.current_state, 
-							UnitState.State.MARCHING, enemy)
+		#unit_state_machine.request_transition(unit, 
+							#unit_state_machine.current_state, 
+							#UnitState.State.MARCHING, enemy)
 	else:
 		# If the dead enemy is not the current target, we might need to handle this differently
 		print("unit_battle_state.gd: Dead unit is not the current target.")
 		
 	# After removing the enemy, check if there are other enemies to engage
-	_check_for_new_enemy()
+	#_check_for_new_enemy()
 
 	# This helper function is called to find a new closest enemy after the death of the current one
 func _check_for_new_enemy() -> void:

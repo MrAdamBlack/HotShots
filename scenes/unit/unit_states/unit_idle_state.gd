@@ -10,6 +10,7 @@ func enter() -> void:
 		if group == "dragging":
 			unit.remove_from_group(group)
 	SignalBus.connect("march_wave", Callable(self, "_on_march_wave"))
+	unit.disconnect_enemy_dead_signal()
 
 func exit() -> void:
 	print("********** Exiting Idle State ********** [%s] (%s)" % [unit.stats.name, unit])

@@ -30,10 +30,14 @@ var enemy: Unit = null
 
 func _ready() -> void:
 	print("unit.gd. Unit READY: ", self)
-	#SignalBus.health_depleted.connect(_on_health_depleted)
-	# Ensure that Unit is connected to the health-depleted signal of UnitStats
-	stats.self_dead.connect(_on_self_dead)
-	SignalBus.enemy_dead.connect(_on_enemy_dead)
+
+	# Connect self_dead signal once
+	if not stats.is_connected("self_dead", Callable(self, "_on_self_dead")):
+		stats.self_dead.connect(Callable(self, "_on_self_dead"))
+	
+	# Connect enemy_dead signal once
+	if not SignalBus.enemy_dead.is_connected(_on_enemy_dead):
+		SignalBus.enemy_dead.connect(_on_enemy_dead)
 
 	if collision_area_of_interest.shape is CircleShape2D:
 		collision_area_of_interest.shape.radius = stats.area_of_interest
@@ -100,8 +104,8 @@ func update_health_bar() -> void:
 		health_bar.value = current / maximum * health_bar.max_value
 
 func take_damage(amount: float) -> void:
-	print("unit.gd: Take Damage")
-	print("\t", self.stats.name, " is taking damage!!!")
+	#print("unit.gd: Take Damage")
+	#print("\t", self.stats.name, " is taking damage!!!")
 	stats.health -= amount
 	stats.health = max(stats.health, 0)
 	update_health_bar()
@@ -119,8 +123,8 @@ func is_dead() -> bool:
 	return stats.health <= 0
 
 func set_stats(value: UnitStats) -> void:
-	if stats and SignalBus.enemy_dead.is_connected(self._on_health_depleted):
-		SignalBus.enemy_dead.disconnect(self._on_health_depleted)
+	#if stats and SignalBus.enemy_dead.is_connected(self._on_health_depleted):
+		#SignalBus.enemy_dead.disconnect(self._on_health_depleted)
 
 	stats = value
 	if value == null:
@@ -137,17 +141,17 @@ func set_stats(value: UnitStats) -> void:
 	tier_icon.stats = stats
 	update_health_bar()
 
-func _on_health_depleted(dead_unit: Unit) -> void:
-	print("unit.gd: _on_health_depleted")
-	print("\t Self: ", self.stats.name)
-	print("\t _Stats: ", dead_unit.stats.name)
-	
-	if dead_unit == self:
-		print(">>> unit.gd: I DIED", self.stats.name)
-		#SignalBus.health_depleted.emit(self)
-		handle_death()
-	else:
-		print("Someone else died: ", dead_unit.stats.name)
+#func _on_health_depleted(dead_unit: Unit) -> void:
+	#print("unit.gd: _on_health_depleted")
+	#print("\t Self: ", self.stats.name)
+	#print("\t _Stats: ", dead_unit.stats.name)
+	#
+	#if dead_unit == self:
+		#print(">>> unit.gd: I DIED", self.stats.name)
+		##SignalBus.health_depleted.emit(self)
+		#handle_death()
+	#else:
+		#print("Someone else died: ", dead_unit.stats.name)
 
 func _find_closest_enemy() -> Unit:
 	if nearby_enemies.size() == 0:
@@ -230,10 +234,13 @@ func _update_target() -> void:
 		transition_to_post_battle()
 
 func _on_enemy_dead(dead_unit: Unit) -> void:
-	print("<<<<<<< unit.gd: SIGNAL self_dead")
-	print("\tFunc: _on_self_dead")
+	print("unit.gd: _on_enemy_dead")
 	print("\tI am: ", self.stats.name)
 	print("\tDead Unit: ", dead_unit.stats.name)
+	if dead_unit == self:
+		print("Disregard SIGNAL as I am the dead unit")
+		print("\tUnit: ", self.stats.name)
+		return
 	# Remove from both tracking arrays
 	if dead_unit in nearby_enemies:
 		nearby_enemies.erase(dead_unit)
@@ -246,14 +253,27 @@ func _on_self_dead(dead_stats: UnitStats) -> void:
 	print("<<<<<<< unit.gd: SIGNAL self_dead")
 	print("\tFunc: _on_self_dead")
 	print("\tI am: ", dead_stats.name)
+	#print("\tStack: ", get_stack())
 	if dead_stats == self.stats:
-		print("\t>>> unit.gd: Dead Enemy ", self.stats.name)
-		SignalBus.enemy_dead.emit(self)
 		handle_death()
+		print("\t>>> unit.gd: EMIT enemy_dead(", self.stats.name,")")
+		# Check connection count before disconnecting
+		print("\tConnection count BEFORE disconnecting: ", SignalBus.enemy_dead.get_connections().size())
+		SignalBus.enemy_dead.disconnect(_on_enemy_dead)
+		print("\tConnection count AFTER disconnecting: ", SignalBus.enemy_dead.get_connections().size())
+		SignalBus.enemy_dead.emit(self)
+		
+		
 	else:
+		# This never calls...
 		print("\tSomeone else died: ", dead_stats.name)
 
 func transition_to_post_battle() -> void:
 	unit_state_machine.request_transition(self, 
 					unit_state_machine.current_state, 
 					UnitState.State.POST_BATTLE)
+
+func disconnect_enemy_dead_signal():
+	if SignalBus.enemy_dead.is_connected(_on_enemy_dead):
+		SignalBus.enemy_dead.disconnect(_on_enemy_dead)
+		print("Unit.gd: Disconnected from enemy_dead")
